@@ -15,9 +15,74 @@ Boolean Functions
 <img width="575" height="65" alt="image" src="https://github.com/user-attachments/assets/04c2d90c-0b6b-4b35-b603-d0e10e1e4f00" />
 
 ## Design / RTL Program
+```
+module mux2to1 (
+    input wire A,
+    input wire B,
+    input wire S,
+    output wire Y
+);
+    assign Y = (~S & A) | (S & B);
+endmodule
+
+module demux1to2 (
+    input wire D,
+    input wire S,
+    output wire Y0,
+    output wire Y1
+);
+    assign Y0 = (~S) & D;
+    assign Y1 = S & D;
+endmodule
+```
 
 
 ## **Testbench Program
+```
+module tb4;
+    reg A, B, S, D;
+    wire Y;
+    wire Y0, Y1;
+
+    // Instantiate 2:1 Multiplexer
+    mux2to1 mux_uut (
+        .A(A),
+        .B(B),
+        .S(S),
+        .Y(Y)
+    );
+
+    // Instantiate 1:2 Demultiplexer
+    demux1to2 demux_uut (
+        .D(D),
+        .S(S),
+        .Y0(Y0),
+        .Y1(Y1)
+    );
+
+    initial begin
+        $dumpfile("mux_demux.vcd");
+        $dumpvars(0, tb4);
+
+        $monitor("Time=%0t S=%b A=%b B=%b Y=%b | D=%b Y0=%b Y1=%b",
+                 $time, S, A, B, Y, D, Y0, Y1);
+
+        // MUX select = 0
+        S = 0; A = 0; B = 0; D = 0; #10;
+        S = 0; A = 0; B = 1; D = 1; #10;
+        S = 0; A = 1; B = 0; D = 1; #10;
+        S = 0; A = 1; B = 1; D = 0; #10;
+
+        // MUX select = 1
+        S = 1; A = 0; B = 0; D = 0; #10;
+        S = 1; A = 0; B = 1; D = 1; #10;
+        S = 1; A = 1; B = 0; D = 1; #10;
+        S = 1; A = 1; B = 1; D = 0; #10;
+
+        #10 $finish;
+    end
+endmodule
+```
 
 
 
@@ -84,6 +149,10 @@ The 2:1 Multiplexer and 1:2 Demultiplexer were realized using Verilog HDL:
 The design was compiled and simulated using Synopsys VCS, and the functionality was verified using DVE waveform analysis, matching the expected truth table.
 
 ## Output
+<img width="1847" height="1022" alt="exp-4 (2)" src="https://github.com/user-attachments/assets/2c3d7046-aad0-4bd3-8fae-8028f83000c3" />
+<img width="1855" height="1022" alt="exp-4" src="https://github.com/user-attachments/assets/ae6180fa-c2f5-4562-b1b2-551e471e705a" />
+
+
 
 
 ## Viva-Voce Questions
